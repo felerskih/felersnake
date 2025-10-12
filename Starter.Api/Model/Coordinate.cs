@@ -14,4 +14,18 @@ public class Coordinate
         X = x;
         Y = y;
     }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+            return false;
+
+        Coordinate other = (Coordinate)obj;
+        return this.X == other.X && this.Y == other.Y;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(X, Y);
+    }
 }
