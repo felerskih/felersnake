@@ -21,6 +21,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
@@ -68,3 +71,4 @@ jobs:
           package: .
 
           
+
