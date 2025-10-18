@@ -8,6 +8,10 @@ on:
     branches:
       - master
   workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag, or commit SHA to deploy"
+        required: false
 
 jobs:
   build:
@@ -62,4 +66,5 @@ jobs:
           app-name: 'Felersnake'
           slot-name: 'Production'
           package: .
+
           
