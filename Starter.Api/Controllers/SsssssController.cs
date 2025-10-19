@@ -8,10 +8,12 @@ namespace Starter.Api.Controllers
     public class SsssssController : ControllerBase
     {
         private readonly IMoveService _moveService;
+        private readonly ITargetService _targetService;
 
-        public SsssssController(IMoveService moveService)
+        public SsssssController(IMoveService moveService, ITargetService targetService)
         {
             _moveService = moveService;
+            _targetService = targetService;
         }
 
         [HttpGet("/")]
@@ -37,7 +39,7 @@ namespace Starter.Api.Controllers
         [HttpPost("/move")]
         public IActionResult Move(GameStatusRequest game)
         {
-            var goal = _moveService.DetermineGoal(game);
+            var goal = _targetService.DetermineGoal(game);
             var nextMove = _moveService.Move(game, goal);
             return Ok(nextMove);
         }

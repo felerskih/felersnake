@@ -7,7 +7,6 @@ namespace Starter.Api.Services
     public interface IMoveService
     {
         MoveResponse Move(GameStatusRequest game, Coordinate goal);
-        Coordinate DetermineGoal(GameStatusRequest game);
     }
 
     public class MoveService : IMoveService
@@ -19,12 +18,7 @@ namespace Starter.Api.Services
                 new Coordinate(-1, 0), // left
                 new Coordinate(1, 0)   // right
             };
-        public Coordinate DetermineGoal(GameStatusRequest game)
-        {
-            var myHead = game.You.Body.First(); // Head position
-            var foodDistances = game.Board.Food.Select(it => new { Coordinate = it, dist = Math.Abs(it.X - myHead.X) + Math.Abs(it.Y - myHead.Y) });
-            return foodDistances.OrderBy(it => it.dist).First().Coordinate;
-        }
+       
 
         public MoveResponse Move(GameStatusRequest game, Coordinate goal)
         {
