@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddTransient<IMoveService, MoveService>();
 builder.Services.AddTransient<ITargetService, TargetService>();
+builder.Services.AddTransient<ICoordinateChecker, CoordinateChecker>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

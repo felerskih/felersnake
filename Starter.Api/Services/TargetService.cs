@@ -10,11 +10,22 @@ namespace Starter.Api.Services
 
     public class TargetService : ITargetService
     {
+        private readonly ICoordinateChecker _coordinateChecker;
+
+        public TargetService(ICoordinateChecker coordinateChecker)
+        {
+            _coordinateChecker = coordinateChecker;
+        }
+
         public Coordinate DetermineGoal(GameStatusRequest game)
         {
             var myHead = game.You.Body.First(); // Head position
+            var me = game.You.Id;
 
-            var foodDistances = game.Board.Food.Select(it => new { Coordinate = it, dist = Math.Abs(it.X - myHead.X) + Math.Abs(it.Y - myHead.Y) });
+            var foodDistances = game.Board.Food.Where(it => !_coordinateChecker.IsCoordinateMovableToByAnotherSnake(game.Board, it, me))
+                .Select(it => new { Coordinate = it, dist = Math.Abs(it.X - myHead.X) + Math.Abs(it.Y - myHead.Y) });
+
+            //TODO: if no food pick any safe square
             return foodDistances.OrderBy(it => it.dist).First().Coordinate;
         }
 
@@ -53,19 +64,19 @@ namespace Starter.Api.Services
             }
         }
 
-        private Coordinate PatrolQuadrant(int minX, int maxX, int minY, int maxY, Board board, Coordinate myHead)
-        {
-            var food = board.Food.Where(it => it.X >= minX && it.X <= maxX && it.Y >= minY && it.Y <= maxY);
-            if (food.Any())
-            {
-                var foodDistances = food.Select(it => new { Coordinate = it, dist = Math.Abs(it.X - myHead.X) + Math.Abs(it.Y - myHead.Y) });
-                return foodDistances.OrderBy(it => it.dist).First().Coordinate;
-            }
-            else
-            {
-                // Patrol quadrant
-                //Determine orientation and direction to nearest corner
-            }
-        }
+        //private Coordinate PatrolQuadrant(int minX, int maxX, int minY, int maxY, Board board, Coordinate myHead)
+        //{
+        //    var food = board.Food.Where(it => it.X >= minX && it.X <= maxX && it.Y >= minY && it.Y <= maxY);
+        //    if (food.Any())
+        //    {
+        //        var foodDistances = food.Select(it => new { Coordinate = it, dist = Math.Abs(it.X - myHead.X) + Math.Abs(it.Y - myHead.Y) });
+        //        return foodDistances.OrderBy(it => it.dist).First().Coordinate;
+        //    }
+        //    else
+        //    {
+        //        // Patrol quadrant
+        //        //Determine orientation and direction to nearest corner
+        //    }
+        //}
     }
 }
