@@ -1,6 +1,6 @@
-﻿using Starter.Api.Requests;
+﻿using Starter.Api.Global;
+using Starter.Api.Requests;
 using Starter.Api.Responses;
-using System.IO;
 
 namespace Starter.Api.Services
 {
@@ -12,62 +12,62 @@ namespace Starter.Api.Services
     public class MoveService : IMoveService
     {
         private readonly ICoordinateChecker _coordinateChecker;
+        private readonly GlobalSnakeValues _global;
         
-        public MoveService(ICoordinateChecker coordinateChecker)
+        public MoveService(ICoordinateChecker coordinateChecker, GlobalSnakeValues global)
         {
             _coordinateChecker = coordinateChecker;
+            _global = global;
         }
-        
+
+
         public MoveResponse Move(GameStatusRequest game, Coordinate goal)
         {
-            string move = "left"; //default move
-            var myId = game.You.Id;
             var myHead = game.You.Body.First(); // Head position
+            var myId = game.You.Id;
             var board = game.Board;
+
+
+            var cameFrom = SearchFrontierForGoal(myHead, board, goal, myId);
+
+            var path = GetPath(goal, cameFrom);
+            var move = GetDirectionFromPath(path, myHead);
+            return new MoveResponse
+            {
+                Move = move,
+                Shout = $"{move}"
+            };
+        }
+
+        private Dictionary<Coordinate, Coordinate?> SearchFrontierForGoal(Coordinate myHead, Board board, Coordinate goal, string myId)
+        {
             var frontier = new Queue<Coordinate>();
             var cameFrom = new Dictionary<Coordinate, Coordinate?>();
-            frontier.Enqueue(myHead); //start
+            frontier.Enqueue(myHead);
             cameFrom[myHead] = null;
-
-            Coordinate[] directions = new Coordinate[]
-            {
-                new Coordinate(0, -1), // down
-                new Coordinate(0, 1),  // up
-                new Coordinate(-1, 0), // left
-                new Coordinate(1, 0)   // right
-            };
-
-
             while (frontier.Count > 0)
             {
                 var current = frontier.Dequeue();
                 if (current.Equals(goal))
                     break;
 
-                foreach (var d in directions)
+                foreach (var d in _global.Directions)
                 {
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
 
-                    // Skip if out of bounds or blocked
-                    if (next.X < 0 || next.X >= board.Width || next.Y < 0 || next.Y >= board.Height)
-                        continue;
-                    if (board.Hazards.ToList().Contains(next))
-                        continue;
-                    if (board.Snakes.Any(s => s.Body.Skip(1).ToList().Contains(next))) // Skip if colliding with any snake body except head
-                        continue;
-                    if(_coordinateChecker.IsCoordinateMovableToByAnotherSnake(board, next, myId))
-                        continue;
-
-                    if (!cameFrom.ContainsKey(next))
+                    if (_coordinateChecker.IsCoordinateSafe(board, next, myId) && !cameFrom.ContainsKey(next))
                     {
                         frontier.Enqueue(next);
                         cameFrom[next] = current;
                     }
                 }
             }
+            return cameFrom;
+        }
 
+        private List<Coordinate> GetPath(Coordinate goal, Dictionary<Coordinate, Coordinate?> cameFrom)
+        {
             var path = new List<Coordinate>();
-
             if (cameFrom.ContainsKey(goal))
             {
                 var node = goal;
@@ -79,109 +79,20 @@ namespace Starter.Api.Services
                 path.Reverse();
             }
 
+            return path;
+        }
+
+        private string GetDirectionFromPath(List<Coordinate> path, Coordinate myHead)
+        {
             if (path.Count > 1)
             {
                 var next = path[1]; // the tile after head
-                if (next.X > myHead.X) move = "right";
-                else if (next.X < myHead.X) move = "left";
-                else if (next.Y > myHead.Y) move = "up";
-                else if (next.Y < myHead.Y) move = "down";
-            }
-
-            return new MoveResponse
-            {
-                Move = move,
-                Shout = $"{move}"
-            };
+                if (next.X > myHead.X) return "right";
+                else if (next.X < myHead.X) return "left";
+                else if (next.Y > myHead.Y) return "up";
+                else if (next.Y < myHead.Y) return "down";
+            }//Else, we couldn't get to goal, need to pick new goal to play for time
+            return "left";
         }
-        //private readonly Coordinate[] directions = new Coordinate[]
-        //    {
-        //        new Coordinate(0, -1), // down
-        //        new Coordinate(0, 1),  // up
-        //        new Coordinate(-1, 0), // left
-        //        new Coordinate(1, 0)   // right
-        //    };
-
-
-        //public MoveResponse Move(GameStatusRequest game, Coordinate goal)
-        //{
-        //    var myHead = game.You.Body.First(); // Head position
-        //    var board = game.Board;
-
-
-        //    var cameFrom = SearchFrontierForGoal(myHead, board, goal);
-
-        //    var path = GetPath(goal, cameFrom);
-        //    var move = GetDirectionFromPath(path, myHead);
-        //    return new MoveResponse
-        //    {
-        //        Move = move,
-        //        Shout = $"{move}"
-        //    };
-        //}
-
-        //private Dictionary<Coordinate,Coordinate?> SearchFrontierForGoal(Coordinate myHead, Board board, Coordinate goal)
-        //{
-        //    var frontier = new Queue<Coordinate>();
-        //    var cameFrom = new Dictionary<Coordinate, Coordinate?>();
-        //    frontier.Enqueue(myHead);
-        //    cameFrom[myHead] = null;
-        //    while (frontier.Count > 0)
-        //    {
-        //        var current = frontier.Dequeue();
-        //        if (current.Equals(goal))
-        //            break;
-
-        //        foreach (var d in directions)
-        //        {
-        //            var next = new Coordinate(current.X + d.X, current.Y + d.Y);
-
-        //            // Skip if out of bounds or blocked
-        //            if (next.X < 0 || next.X >= board.Width || next.Y < 0 || next.Y >= board.Height)
-        //                continue;
-        //            if (board.Hazards.ToList().Contains(next))
-        //                continue;
-        //            if (board.Snakes.Any(s => s.Body.Skip(1).ToList().Contains(next))) // Skip if colliding with any snake body except head
-        //                continue;
-
-        //            if (!cameFrom.ContainsKey(next))
-        //            {
-        //                frontier.Enqueue(next);
-        //                cameFrom[next] = current;
-        //            }
-        //        }
-        //    }
-        //    return cameFrom;
-        //}
-
-        //private List<Coordinate> GetPath(Coordinate goal, Dictionary<Coordinate, Coordinate?> cameFrom)
-        //{
-        //    var path = new List<Coordinate>();
-        //    if (cameFrom.ContainsKey(goal))
-        //    {
-        //        var node = goal;
-        //        while (node != null)
-        //        {
-        //            path.Add(node);
-        //            node = cameFrom[node];
-        //        }
-        //        path.Reverse();
-        //    }
-
-        //    return path;
-        //}
-
-        //private string GetDirectionFromPath(List<Coordinate> path, Coordinate myHead)
-        //{
-        //    if (path.Count > 1)
-        //    {
-        //        var next = path[1]; // the tile after head
-        //        if (next.X > myHead.X) return "right";
-        //        else if (next.X < myHead.X) return "left";
-        //        else if (next.Y > myHead.Y) return "up";
-        //        else if (next.Y < myHead.Y) return "down";
-        //    }
-        //    return "up";
-        //}
     }
 }

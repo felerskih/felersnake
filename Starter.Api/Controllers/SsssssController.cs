@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Starter.Api.Requests;
 using Starter.Api.Services;
+using System.Drawing;
 
 namespace Starter.Api.Controllers
 {
@@ -23,7 +24,8 @@ namespace Starter.Api.Controllers
             {
                 apiversion = "1",
                 author = "trickett", // TODO: Your Battlesnake Username
-                color = "#fc7b03", // TODO: Personalize
+                //color = "#fc7b03", // TODO: Personalize
+                Color = "#008080",
                 head = "gamer", // TODO: Personalize
                 tail = "pixel"  // TODO: Personalize
             };
