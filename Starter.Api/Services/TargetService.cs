@@ -22,7 +22,7 @@ namespace Starter.Api.Services
         public Coordinate DetermineGoal(GameStatusRequest game)
         {
             var myHead = game.You.Body.First(); // Head position
-            var me = game.You.Id;
+            var me = game.You;
 
             var foodDistances = game.Board.Food.Where(it => !_coordinateChecker.IsCoordinateMovableToByAnotherSnake(game.Board, it, me))
                 .Select(it => new { Coordinate = it, dist = Math.Abs(it.X - myHead.X) + Math.Abs(it.Y - myHead.Y) });

@@ -24,11 +24,11 @@ namespace Starter.Api.Services
         public MoveResponse Move(GameStatusRequest game, Coordinate goal)
         {
             var myHead = game.You.Body.First(); // Head position
-            var myId = game.You.Id;
+            var me = game.You;
             var board = game.Board;
 
 
-            var cameFrom = SearchFrontierForGoal(myHead, board, goal, myId);
+            var cameFrom = SearchFrontierForGoal(myHead, board, goal, me);
 
             var path = GetPath(goal, cameFrom);
             var move = GetDirectionFromPath(path, myHead);
@@ -39,7 +39,7 @@ namespace Starter.Api.Services
             };
         }
 
-        private Dictionary<Coordinate, Coordinate?> SearchFrontierForGoal(Coordinate myHead, Board board, Coordinate goal, string myId)
+        private Dictionary<Coordinate, Coordinate?> SearchFrontierForGoal(Coordinate myHead, Board board, Coordinate goal, Snake me)
         {
             var frontier = new Queue<Coordinate>();
             var cameFrom = new Dictionary<Coordinate, Coordinate?>();
@@ -55,7 +55,7 @@ namespace Starter.Api.Services
                 {
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
 
-                    if (_coordinateChecker.IsCoordinateSafe(board, next, myId) && !cameFrom.ContainsKey(next))
+                    if (_coordinateChecker.IsCoordinateSafe(board, next, me) && !cameFrom.ContainsKey(next))
                     {
                         frontier.Enqueue(next);
                         cameFrom[next] = current;

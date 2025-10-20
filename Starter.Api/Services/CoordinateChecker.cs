@@ -4,8 +4,8 @@ namespace Starter.Api.Services
 {
     public interface ICoordinateChecker
     {
-        bool IsCoordinateSafe(Board board, Coordinate toCheck, string myId);
-        bool IsCoordinateMovableToByAnotherSnake(Board board, Coordinate toCheck, string myId);
+        bool IsCoordinateSafe(Board board, Coordinate toCheck, Snake me);
+        bool IsCoordinateMovableToByAnotherSnake(Board board, Coordinate toCheck, Snake me);
         bool IsCoordinateImmediatelySafe(Board board, Coordinate toCheck);
     }
 
@@ -18,23 +18,23 @@ namespace Starter.Api.Services
             _global = global;
         }
 
-        public bool IsCoordinateSafe(Board board, Coordinate toCheck, string myId)
+        public bool IsCoordinateSafe(Board board, Coordinate toCheck, Snake me)
         {
             if(!IsCoordinateImmediatelySafe(board, toCheck))
                 return false;
-            if (IsCoordinateMovableToByAnotherSnake(board, toCheck, myId))
+            if (IsCoordinateMovableToByAnotherSnake(board, toCheck, me))
                 return false;
             return true;
         }
 
-        public bool IsCoordinateMovableToByAnotherSnake(Board board, Coordinate toCheck, string myId)
+        public bool IsCoordinateMovableToByAnotherSnake(Board board, Coordinate toCheck, Snake me)
         {
             bool notSafe = false;
 
             foreach(var d in _global.Directions)
             {
                 var next = new Coordinate(toCheck.X + d.X, toCheck.Y + d.Y);
-                if (board.Snakes.Any(s => s.Id != myId && s.Head.Equals(next))) //if  I'm longer, it's safe
+                if (board.Snakes.Any(s => s.Id != me.Id && s.Head.Equals(next) && s.Length >= me.Length))
                     notSafe = true;
             }
 
@@ -49,22 +49,11 @@ namespace Starter.Api.Services
             // Check if in hazards
             if (board.Hazards.ToList().Contains(toCheck))
                 return false;
-            // Check if colliding with any snake, can't collide with tail as it moves next turn
-            if (board.Snakes.Any(s => s.Body.ToList().Contains(toCheck) && (!s.Body.Last().Equals(toCheck) || IsSnakeAdjacentToFood(s, board))))
+            // Check if colliding with any snake, can't collide with tail as it moves next turn unless eating food...
+            if (board.Snakes.Any(s => s.Body.ToList().Contains(toCheck) && (!s.Body.Last().Equals(toCheck) || s.Health == 100)))
                 return false;
             return true;
         }
 
-        public bool IsSnakeAdjacentToFood(Snake snake, Board board)
-        {
-            foreach(var d in _global.Directions)
-            {
-                var next = new Coordinate(snake.Head.X + d.X, snake.Head.Y + d.Y);
-                if (board.Food.ToList().Contains(next))
-                    return true;
-            }
-            return false;
-        }
-            
     }
 }
