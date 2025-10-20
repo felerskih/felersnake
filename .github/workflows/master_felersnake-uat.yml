@@ -4,10 +4,11 @@
 name: Build and deploy ASP.Net Core app to Azure Web App - Felersnake-Uat
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag, or commit SHA to deploy"
+        required: false
 
 jobs:
   build:
@@ -17,6 +18,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
