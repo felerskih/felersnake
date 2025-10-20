@@ -43,7 +43,7 @@ namespace Starter.Api.Services
                 if (_coordinateChecker.IsCoordinateImmediatelySafe(game.Board, next) && !game.Board.Food.Contains(next))
                     return next;
             }
-
+            //TODO: avoid areas that will trap us in the future even if there is food
             return myHead; // No safe move found, stay in place (will die)
         }
 

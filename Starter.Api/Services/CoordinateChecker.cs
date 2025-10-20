@@ -34,7 +34,7 @@ namespace Starter.Api.Services
             foreach(var d in _global.Directions)
             {
                 var next = new Coordinate(toCheck.X + d.X, toCheck.Y + d.Y);
-                if (board.Snakes.Any(s => s.Id != myId && s.Head.Equals(next)))
+                if (board.Snakes.Any(s => s.Id != myId && s.Head.Equals(next))) //if  I'm longer, it's safe
                     notSafe = true;
             }
 
@@ -50,9 +50,21 @@ namespace Starter.Api.Services
             if (board.Hazards.ToList().Contains(toCheck))
                 return false;
             // Check if colliding with any snake, can't collide with tail as it moves next turn
-            if (board.Snakes.Any(s => s.Body.ToList().Contains(toCheck) && !s.Body.Last().Equals(toCheck)))
+            if (board.Snakes.Any(s => s.Body.ToList().Contains(toCheck) && (!s.Body.Last().Equals(toCheck) || IsSnakeAdjacentToFood(s, board))))
                 return false;
             return true;
         }
+
+        public bool IsSnakeAdjacentToFood(Snake snake, Board board)
+        {
+            foreach(var d in _global.Directions)
+            {
+                var next = new Coordinate(snake.Head.X + d.X, snake.Head.Y + d.Y);
+                if (board.Food.ToList().Contains(next))
+                    return true;
+            }
+            return false;
+        }
+            
     }
 }
