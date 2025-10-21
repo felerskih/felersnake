@@ -28,9 +28,15 @@ namespace Starter.Api.Services
             var board = game.Board;
 
 
-            var cameFrom = SearchFrontierForGoal(myHead, board, goal, me);
-
+            var cameFrom = SearchFrontierForSafeGoal(myHead, board, goal, me);
             var path = GetPath(goal, cameFrom);
+            if(path.Count == 0)
+            {
+                //Couldn't find safe path to goal, try for immediately safe path
+                cameFrom = SearchFrontierForImmediatelySafeGoal(myHead, board, goal);
+                path = GetPath(goal, cameFrom);
+            }
+
             var move = GetDirectionFromPath(path, myHead);
             return new MoveResponse
             {
@@ -39,7 +45,7 @@ namespace Starter.Api.Services
             };
         }
 
-        private Dictionary<Coordinate, Coordinate?> SearchFrontierForGoal(Coordinate myHead, Board board, Coordinate goal, Snake me)
+        private Dictionary<Coordinate, Coordinate?> SearchFrontierForSafeGoal(Coordinate myHead, Board board, Coordinate goal, Snake me)
         {
             var frontier = new Queue<Coordinate>();
             var cameFrom = new Dictionary<Coordinate, Coordinate?>();
@@ -56,6 +62,30 @@ namespace Starter.Api.Services
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
 
                     if (_coordinateChecker.IsCoordinateSafe(board, next, me) && !cameFrom.ContainsKey(next))
+                    {
+                        frontier.Enqueue(next);
+                        cameFrom[next] = current;
+                    }
+                }
+            }
+            return cameFrom;
+        }
+
+        private Dictionary<Coordinate, Coordinate?> SearchFrontierForImmediatelySafeGoal(Coordinate myHead, Board board, Coordinate goal)
+        {
+            var frontier = new Queue<Coordinate>();
+            var cameFrom = new Dictionary<Coordinate, Coordinate?>();
+            frontier.Enqueue(myHead);
+            cameFrom[myHead] = null;
+            while (frontier.Count > 0)
+            {
+                var current = frontier.Dequeue();
+                if (current.Equals(goal))
+                    break;
+                foreach (var d in _global.Directions)
+                {
+                    var next = new Coordinate(current.X + d.X, current.Y + d.Y);
+                    if (_coordinateChecker.IsCoordinateImmediatelySafe(board, next) && !cameFrom.ContainsKey(next))
                     {
                         frontier.Enqueue(next);
                         cameFrom[next] = current;
