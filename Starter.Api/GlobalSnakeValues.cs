@@ -1,4 +1,6 @@
-﻿namespace Starter.Api.Global
+﻿using Starter.Api;
+
+namespace Felersnake.Global
 {
     public class GlobalSnakeValues
     {

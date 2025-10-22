@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Starter.Api.Requests;
 using Starter.Api.Responses;
-using Starter.Api.Services;
-using System.Drawing;
-using System.Reflection.Metadata;
+using Felersnake.Services;
 
 namespace Starter.Api.Controllers
 {

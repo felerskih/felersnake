@@ -1,7 +1,8 @@
-﻿using Starter.Api.Global;
+﻿using Felersnake.Global;
+using Starter.Api;
 using Starter.Api.Requests;
 
-namespace Starter.Api.Services
+namespace Felersnake.Services
 {
     public interface ITargetService
     {

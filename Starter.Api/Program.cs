@@ -1,5 +1,5 @@
-using Starter.Api.Global;
-using Starter.Api.Services;
+using Felersnake.Global;
+using Felersnake.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();

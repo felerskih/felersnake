@@ -1,6 +1,7 @@
-﻿using Starter.Api.Global;
+﻿using Felersnake.Global;
+using Starter.Api;
 
-namespace Starter.Api.Services
+namespace Felersnake.Services
 {
     public interface ICoordinateChecker
     {

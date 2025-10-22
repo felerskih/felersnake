@@ -1,8 +1,8 @@
-﻿using Starter.Api.Global;
+﻿using Felersnake.Global;
+using Starter.Api;
 using Starter.Api.Requests;
-using Starter.Api.Responses;
 
-namespace Starter.Api.Services
+namespace Felersnake.Services
 {
     public interface IMoveService
     {
