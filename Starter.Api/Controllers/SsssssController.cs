@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Starter.Api.Requests;
+using Starter.Api.Responses;
 using Starter.Api.Services;
 using System.Drawing;
+using System.Reflection.Metadata;
 
 namespace Starter.Api.Controllers
 {
@@ -10,6 +12,7 @@ namespace Starter.Api.Controllers
     {
         private readonly IMoveService _moveService;
         private readonly ITargetService _targetService;
+        private readonly string nomove = "none";
 
         public SsssssController(IMoveService moveService, ITargetService targetService)
         {
@@ -43,7 +46,18 @@ namespace Starter.Api.Controllers
         {
             var goal = _targetService.DetermineGoal(game);
             var nextMove = _moveService.Move(game, goal);
-            return Ok(nextMove);
+            if(nextMove.Equals(nomove))
+            {
+                goal = _targetService.DetermineNonFoodGoal(game);
+                nextMove = _moveService.Move(game, goal);
+            }
+
+            var moveResp = new MoveResponse
+            {
+                Move = nextMove,
+                Shout = "Console.Write(Debug)"
+            };
+            return Ok(moveResp);
         }
 
         [HttpPost("/end")]

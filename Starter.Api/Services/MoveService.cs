@@ -6,7 +6,7 @@ namespace Starter.Api.Services
 {
     public interface IMoveService
     {
-        MoveResponse Move(GameStatusRequest game, Coordinate goal);
+        string Move(GameStatusRequest game, Coordinate goal);
     }
 
     public class MoveService : IMoveService
@@ -21,7 +21,7 @@ namespace Starter.Api.Services
         }
 
 
-        public MoveResponse Move(GameStatusRequest game, Coordinate goal)
+        public string Move(GameStatusRequest game, Coordinate goal)
         {
             var myHead = game.You.Body.First(); // Head position
             var me = game.You;
@@ -37,12 +37,7 @@ namespace Starter.Api.Services
                 path = GetPath(goal, cameFrom);
             }
 
-            var move = GetDirectionFromPath(path, myHead);
-            return new MoveResponse
-            {
-                Move = move,
-                Shout = $"{move}"
-            };
+            return GetDirectionFromPath(path, myHead);
         }
 
         private Dictionary<Coordinate, Coordinate?> SearchFrontierForSafeGoal(Coordinate myHead, Board board, Coordinate goal, Snake me)
@@ -122,7 +117,7 @@ namespace Starter.Api.Services
                 else if (next.Y > myHead.Y) return "up";
                 else if (next.Y < myHead.Y) return "down";
             }//Else, we couldn't get to goal, need to pick new goal to play for time
-            return "left";
+            return "none";
         }
     }
 }

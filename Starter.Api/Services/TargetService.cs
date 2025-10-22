@@ -6,6 +6,7 @@ namespace Starter.Api.Services
     public interface ITargetService
     {
         Coordinate DetermineGoal(GameStatusRequest game);
+        Coordinate DetermineNonFoodGoal(GameStatusRequest game);
     }
 
     public class TargetService : ITargetService
@@ -29,22 +30,30 @@ namespace Starter.Api.Services
 
             if (foodDistances.Any())
                 return foodDistances.OrderBy(it => it.dist).First().Coordinate;
-            
+
+            return DetermineNonFoodGoal(game);
+        }
+
+        public Coordinate DetermineNonFoodGoal(GameStatusRequest game)
+        {
+            var myHead = game.You.Body.First(); // Head position
+            var me = game.You;
+
             foreach (var d in _global.Directions)
             {
                 var next = new Coordinate(myHead.X + d.X, myHead.Y + d.Y);
                 if (_coordinateChecker.IsCoordinateSafe(game.Board, next, me))
                     return next;
             }
-            
-            foreach(var d in _global.Directions)
+
+            foreach (var d in _global.Directions)
             {
                 var next = new Coordinate(myHead.X + d.X, myHead.Y + d.Y);
                 if (_coordinateChecker.IsCoordinateImmediatelySafe(game.Board, next) && !game.Board.Food.Contains(next))
                     return next;
             }
             //TODO: avoid areas that will trap us in the future even if there is food
-            return myHead; // No safe move found, stay in place (will die)
+            return myHead;
         }
 
         //Potential Strategy to use in the future;
