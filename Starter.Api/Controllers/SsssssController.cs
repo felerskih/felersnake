@@ -8,14 +8,14 @@ namespace Starter.Api.Controllers
     [ApiController]
     public class SsssssController : ControllerBase
     {
-        private readonly IMoveService _moveService;
-        private readonly ITargetService _targetService;
+        private readonly IPathFinder _pathService;
+        private readonly ITargetLocator _targetLocator;
         private readonly string nomove = "none";
 
-        public SsssssController(IMoveService moveService, ITargetService targetService)
+        public SsssssController(IPathFinder pathService, ITargetLocator targetLocator)
         {
-            _moveService = moveService;
-            _targetService = targetService;
+            _pathService = pathService;
+            _targetLocator = targetLocator;
         }
 
         [HttpGet("/")]
@@ -25,8 +25,8 @@ namespace Starter.Api.Controllers
             {
                 apiversion = "1",
                 author = "trickett", // TODO: Your Battlesnake Username
-                color = "#fc7b03", // TODO: Personalize
-                //color = "#008080",
+                //color = "#fc7b03", // TODO: Personalize
+                color = "#008080",
                 head = "gamer", // TODO: Personalize
                 tail = "pixel"  // TODO: Personalize
             };
@@ -42,12 +42,28 @@ namespace Starter.Api.Controllers
         [HttpPost("/move")]
         public IActionResult Move(GameStatusRequest game)
         {
-            var goal = _targetService.DetermineGoal(game);
-            var nextMove = _moveService.Move(game, goal);
+            //Fully safe food goal
+            var foodGoal = _targetLocator.DetermineGoal(game);
+            var nextMove = _pathService.FindPath(game, foodGoal, false);
+
+            //Fully safe non-food goal
+            var nonFoodGoal = foodGoal;
             if(nextMove.Equals(nomove))
             {
-                goal = _targetService.DetermineNonFoodGoal(game);
-                nextMove = _moveService.Move(game, goal);
+                nonFoodGoal = _targetLocator.DetermineNonFoodGoal(game);
+                nextMove = _pathService.FindPath(game, nonFoodGoal, false);
+            }
+
+            //Immediately safe food goal
+            if (nextMove.Equals(nomove))
+            { 
+                nextMove = _pathService.FindPath(game, foodGoal, true);
+            }
+
+            //Immediately safe non-food goal
+            if (nextMove.Equals(nomove))
+            {
+                nextMove = _pathService.FindPath(game, nonFoodGoal, true);
             }
 
             var moveResp = new MoveResponse

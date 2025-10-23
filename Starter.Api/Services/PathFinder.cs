@@ -4,24 +4,24 @@ using Starter.Api.Requests;
 
 namespace Felersnake.Services
 {
-    public interface IMoveService
+    public interface IPathFinder
     {
-        string Move(GameStatusRequest game, Coordinate goal);
+        string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate);
     }
 
-    public class MoveService : IMoveService
+    public class PathFinder : IPathFinder
     {
         private readonly ICoordinateChecker _coordinateChecker;
         private readonly GlobalSnakeValues _global;
         
-        public MoveService(ICoordinateChecker coordinateChecker, GlobalSnakeValues global)
+        public PathFinder(ICoordinateChecker coordinateChecker, GlobalSnakeValues global)
         {
             _coordinateChecker = coordinateChecker;
             _global = global;
         }
 
 
-        public string Move(GameStatusRequest game, Coordinate goal)
+        public string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate)
         {
             var myHead = game.You.Body.First(); // Head position
             var me = game.You;
@@ -30,7 +30,7 @@ namespace Felersnake.Services
 
             var cameFrom = SearchFrontierForSafeGoal(myHead, board, goal, me);
             var path = GetPath(goal, cameFrom);
-            if(path.Count == 0)
+            if(path.Count == 0 && FallbackToImmediate)
             {
                 //Couldn't find safe path to goal, try for immediately safe path
                 cameFrom = SearchFrontierForImmediatelySafeGoal(myHead, board, goal);

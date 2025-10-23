@@ -4,18 +4,18 @@ using Starter.Api.Requests;
 
 namespace Felersnake.Services
 {
-    public interface ITargetService
+    public interface ITargetLocator
     {
         Coordinate DetermineGoal(GameStatusRequest game);
         Coordinate DetermineNonFoodGoal(GameStatusRequest game);
     }
 
-    public class TargetService : ITargetService
+    public class TargetLocator : ITargetLocator
     {
         private readonly ICoordinateChecker _coordinateChecker;
         private readonly GlobalSnakeValues _global;
 
-        public TargetService(ICoordinateChecker coordinateChecker, GlobalSnakeValues global)
+        public TargetLocator(ICoordinateChecker coordinateChecker, GlobalSnakeValues global)
         {
             _coordinateChecker = coordinateChecker;
             _global = global;

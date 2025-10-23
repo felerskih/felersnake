@@ -3,8 +3,8 @@ using Felersnake.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
-builder.Services.AddTransient<IMoveService, MoveService>();
-builder.Services.AddTransient<ITargetService, TargetService>();
+builder.Services.AddTransient<IPathFinder, PathFinder>();
+builder.Services.AddTransient<ITargetLocator, TargetLocator>();
 builder.Services.AddTransient<ICoordinateChecker, CoordinateChecker>();
 builder.Services.AddSingleton<GlobalSnakeValues>();
 builder.Services.AddEndpointsApiExplorer();
