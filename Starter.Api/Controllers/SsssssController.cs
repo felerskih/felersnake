@@ -25,8 +25,8 @@ namespace Starter.Api.Controllers
             {
                 apiversion = "1",
                 author = "trickett", // TODO: Your Battlesnake Username
-                //color = "#fc7b03", // TODO: Personalize
-                color = "#008080",
+                color = "#fc7b03", // TODO: Personalize
+                //color = "#008080",
                 head = "gamer", // TODO: Personalize
                 tail = "pixel"  // TODO: Personalize
             };
