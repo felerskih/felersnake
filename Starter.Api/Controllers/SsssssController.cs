@@ -10,12 +10,14 @@ namespace Starter.Api.Controllers
     {
         private readonly IPathFinder _pathService;
         private readonly ITargetLocator _targetLocator;
+        private readonly ITailSearcher _tailSearcher;
         private readonly string nomove = "none";
 
-        public SsssssController(IPathFinder pathService, ITargetLocator targetLocator)
+        public SsssssController(IPathFinder pathService, ITargetLocator targetLocator, ITailSearcher tailSearcher)
         {
             _pathService = pathService;
             _targetLocator = targetLocator;
+            _tailSearcher = tailSearcher;
         }
 
         [HttpGet("/")]
@@ -48,20 +50,20 @@ namespace Starter.Api.Controllers
 
             //Fully safe non-food goal
             var nonFoodGoal = foodGoal;
-            if(nextMove.Equals(nomove))
+            if(nextMove.Equals(nomove) || !_tailSearcher.CanReachOwnTail(nextMove, game))
             {
                 nonFoodGoal = _targetLocator.DetermineNonFoodGoal(game);
                 nextMove = _pathService.FindPath(game, nonFoodGoal, false);
             }
 
             //Immediately safe food goal
-            if (nextMove.Equals(nomove))
+            if (nextMove.Equals(nomove) || !_tailSearcher.CanReachOwnTail(nextMove, game))
             { 
                 nextMove = _pathService.FindPath(game, foodGoal, true);
             }
 
             //Immediately safe non-food goal
-            if (nextMove.Equals(nomove))
+            if (nextMove.Equals(nomove) || !_tailSearcher.CanReachOwnTail(nextMove, game))
             {
                 nextMove = _pathService.FindPath(game, nonFoodGoal, true);
             }

@@ -7,6 +7,7 @@ namespace Felersnake.Services
     public interface IPathFinder
     {
         string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate);
+        bool FindPathToTail(GameStatusRequest game, Coordinate tail, Coordinate start);
     }
 
     public class PathFinder : IPathFinder
@@ -28,24 +29,41 @@ namespace Felersnake.Services
             var board = game.Board;
 
 
-            var cameFrom = SearchFrontierForSafeGoal(myHead, board, goal, me);
+            var cameFrom = SearchFrontierForSafeGoal(myHead, board, goal, me, false);
             var path = GetPath(goal, cameFrom);
             if(path.Count == 0 && FallbackToImmediate)
             {
                 //Couldn't find safe path to goal, try for immediately safe path
-                cameFrom = SearchFrontierForImmediatelySafeGoal(myHead, board, goal);
+                cameFrom = SearchFrontierForImmediatelySafeGoal(myHead, board, goal, false, me.Id);
                 path = GetPath(goal, cameFrom);
             }
 
             return GetDirectionFromPath(path, myHead);
         }
 
-        private Dictionary<Coordinate, Coordinate?> SearchFrontierForSafeGoal(Coordinate myHead, Board board, Coordinate goal, Snake me)
+        public bool FindPathToTail(GameStatusRequest game, Coordinate tail, Coordinate start)
+        {
+            //tail is part of snake so not snake so need to ignore self it all tail checks
+            var me = game.You;
+            var board = game.Board;
+            var cameFrom = SearchFrontierForSafeGoal(start, board, tail, me, true);
+            var path = GetPath(tail, cameFrom);
+            if (path.Count == 0)
+            {
+                //Couldn't find safe path to goal, try for immediately safe path
+                cameFrom = SearchFrontierForImmediatelySafeGoal(start, board, tail, true, me.Id);
+                path = GetPath(tail, cameFrom);
+            }
+
+            return path.Count > 0;
+        }
+
+        private Dictionary<Coordinate, Coordinate?> SearchFrontierForSafeGoal(Coordinate start, Board board, Coordinate goal, Snake me, bool isTailCheck)
         {
             var frontier = new Queue<Coordinate>();
             var cameFrom = new Dictionary<Coordinate, Coordinate?>();
-            frontier.Enqueue(myHead);
-            cameFrom[myHead] = null;
+            frontier.Enqueue(start);
+            cameFrom[start] = null;
             while (frontier.Count > 0)
             {
                 var current = frontier.Dequeue();
@@ -56,7 +74,7 @@ namespace Felersnake.Services
                 {
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
 
-                    if (_coordinateChecker.IsCoordinateSafe(board, next, me) && !cameFrom.ContainsKey(next))
+                    if (_coordinateChecker.IsCoordinateSafe(board, next, me, isTailCheck) && !cameFrom.ContainsKey(next))
                     {
                         frontier.Enqueue(next);
                         cameFrom[next] = current;
@@ -66,12 +84,12 @@ namespace Felersnake.Services
             return cameFrom;
         }
 
-        private Dictionary<Coordinate, Coordinate?> SearchFrontierForImmediatelySafeGoal(Coordinate myHead, Board board, Coordinate goal)
+        private Dictionary<Coordinate, Coordinate?> SearchFrontierForImmediatelySafeGoal(Coordinate start, Board board, Coordinate goal, bool isTailCheck, string myId)
         {
             var frontier = new Queue<Coordinate>();
             var cameFrom = new Dictionary<Coordinate, Coordinate?>();
-            frontier.Enqueue(myHead);
-            cameFrom[myHead] = null;
+            frontier.Enqueue(start);
+            cameFrom[start] = null;
             while (frontier.Count > 0)
             {
                 var current = frontier.Dequeue();
@@ -80,7 +98,7 @@ namespace Felersnake.Services
                 foreach (var d in _global.Directions)
                 {
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
-                    if (_coordinateChecker.IsCoordinateImmediatelySafe(board, next) && !cameFrom.ContainsKey(next))
+                    if (_coordinateChecker.IsCoordinateImmediatelySafe(board, next, isTailCheck, myId) && !cameFrom.ContainsKey(next))
                     {
                         frontier.Enqueue(next);
                         cameFrom[next] = current;

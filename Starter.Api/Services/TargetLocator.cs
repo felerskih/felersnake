@@ -43,14 +43,14 @@ namespace Felersnake.Services
             foreach (var d in _global.Directions)
             {
                 var next = new Coordinate(myHead.X + d.X, myHead.Y + d.Y);
-                if (_coordinateChecker.IsCoordinateSafe(game.Board, next, me))
+                if (_coordinateChecker.IsCoordinateSafe(game.Board, next, me, false))
                     return next;
             }
 
             foreach (var d in _global.Directions)
             {
                 var next = new Coordinate(myHead.X + d.X, myHead.Y + d.Y);
-                if (_coordinateChecker.IsCoordinateImmediatelySafe(game.Board, next) && !game.Board.Food.Contains(next))
+                if (_coordinateChecker.IsCoordinateImmediatelySafe(game.Board, next, false, me.Id) && !game.Board.Food.Contains(next))
                     return next;
             }
             //TODO: avoid areas that will trap us in the future even if there is food

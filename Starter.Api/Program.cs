@@ -6,6 +6,7 @@ builder.Services.AddControllers();
 builder.Services.AddTransient<IPathFinder, PathFinder>();
 builder.Services.AddTransient<ITargetLocator, TargetLocator>();
 builder.Services.AddTransient<ICoordinateChecker, CoordinateChecker>();
+builder.Services.AddTransient<ITailSearcher, TailSearcher>();
 builder.Services.AddSingleton<GlobalSnakeValues>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
