@@ -5,9 +5,9 @@ namespace Felersnake.Services
 {
     public interface ICoordinateChecker
     {
-        bool IsCoordinateSafe(Board board, Coordinate toCheck, Snake me);
-        bool IsCoordinateMovableToByAnotherSnake(Board board, Coordinate toCheck, Snake me);
-        bool IsCoordinateImmediatelySafe(Board board, Coordinate toCheck);
+        bool IsCoordinateSafe(Board board, Coordinate toCheck, Snake me, bool floodCheck = false);
+        bool IsCoordinateMovableToByAnotherSnake(Board board, Coordinate toCheck, Snake me, bool floodCheck);
+        bool IsCoordinateImmediatelySafe(Board board, Coordinate toCheck, bool floodCheck = false);
     }
 
     public class CoordinateChecker : ICoordinateChecker
@@ -19,30 +19,30 @@ namespace Felersnake.Services
             _global = global;
         }
 
-        public bool IsCoordinateSafe(Board board, Coordinate toCheck, Snake me)
+        public bool IsCoordinateSafe(Board board, Coordinate toCheck, Snake me, bool floodCheck = false)
         {
-            if(!IsCoordinateImmediatelySafe(board, toCheck))
+            if(!IsCoordinateImmediatelySafe(board, toCheck, floodCheck))
                 return false;
-            if (IsCoordinateMovableToByAnotherSnake(board, toCheck, me))
+            if (IsCoordinateMovableToByAnotherSnake(board, toCheck, me, floodCheck))
                 return false;
             return true;
         }
 
-        public bool IsCoordinateMovableToByAnotherSnake(Board board, Coordinate toCheck, Snake me)
+        public bool IsCoordinateMovableToByAnotherSnake(Board board, Coordinate toCheck, Snake me, bool floodCheck)
         {
             bool notSafe = false;
 
             foreach(var d in _global.Directions)
             {
                 var next = new Coordinate(toCheck.X + d.X, toCheck.Y + d.Y);
-                if (board.Snakes.Any(s => s.Id != me.Id && s.Head.Equals(next) && s.Length >= me.Length))
+                if (board.Snakes.Any(s => s.Id != me.Id && s.Head.Equals(next) && (s.Length >= me.Length || !floodCheck)))
                     notSafe = true;
             }
 
             return notSafe;
         }
 
-        public bool IsCoordinateImmediatelySafe(Board board, Coordinate toCheck)
+        public bool IsCoordinateImmediatelySafe(Board board, Coordinate toCheck, bool floodCheck = false)
         {
             // Check if out of bounds
             if (toCheck.X < 0 || toCheck.X >= board.Width || toCheck.Y < 0 || toCheck.Y >= board.Height)
@@ -51,10 +51,9 @@ namespace Felersnake.Services
             if (board.Hazards.ToList().Contains(toCheck))
                 return false;
             // Check if colliding with any snake, can't collide with tail as it moves next turn unless eating food...
-            if (board.Snakes.Any(s => s.Body.ToList().Contains(toCheck) && (!s.Body.Last().Equals(toCheck) || s.Health == 100)))
+            if (board.Snakes.Any(s => s.Body.ToList().Contains(toCheck) && (!s.Body.Last().Equals(toCheck) || s.Health == 100 || floodCheck)))
                 return false;
             return true;
         }
-
     }
 }
