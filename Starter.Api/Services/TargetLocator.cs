@@ -26,7 +26,7 @@ namespace Felersnake.Services
             var myHead = game.You.Body.First(); // Head position
             var me = game.You;
 
-            var foodDistances = game.Board.Food.Where(it => !_coordinateChecker.IsCoordinateMovableToByAnotherSnake(game.Board, it, me))
+            var foodDistances = game.Board.Food.Where(it => !_coordinateChecker.IsCoordinateMovableToByAnotherSnake(game.Board, it, me, false))
                 .Select(it => new { Coordinate = it, dist = Math.Abs(it.X - myHead.X) + Math.Abs(it.Y - myHead.Y) });
 
             if (foodDistances.Any())

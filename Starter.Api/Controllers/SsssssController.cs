@@ -10,12 +10,14 @@ namespace Starter.Api.Controllers
     {
         private readonly IPathFinder _pathService;
         private readonly ITargetLocator _targetLocator;
+        private readonly IFloodFiller _floodFiller;
         private readonly string nomove = "none";
 
-        public SsssssController(IPathFinder pathService, ITargetLocator targetLocator)
+        public SsssssController(IPathFinder pathService, ITargetLocator targetLocator, IFloodFiller floodFiller)
         {
             _pathService = pathService;
             _targetLocator = targetLocator;
+            _floodFiller = floodFiller;
         }
 
         [HttpGet("/")]
@@ -64,6 +66,12 @@ namespace Starter.Api.Controllers
             if (nextMove.Equals(nomove))
             {
                 nextMove = _pathService.FindPath(game, nonFoodGoal, true);
+            }
+
+            //No safe food, flood fill to largest area
+            if(nextMove.Equals(nomove) || !_floodFiller.CanFlood(nextMove, game)) // bug in canflood
+            {
+                nextMove = _floodFiller.GetBestDirection(game);
             }
 
             var moveResp = new MoveResponse
