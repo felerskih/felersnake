@@ -46,4 +46,4 @@ ENV DOTNET_EnableDiagnostics=0
 ENV DOTNET_gcServer=1
 
 # Run the application
-ENTRYPOINT ["dotnet", "YourApp.dll"]
+ENTRYPOINT ["dotnet", "Felersnake.dll"]
