@@ -49,24 +49,25 @@ namespace Starter.Api.Controllers
             var nextMove = _pathService.FindPath(game, foodGoal, false);
 
             //Fully safe non-food goal
-            var nonFoodGoal = foodGoal;
-            if(nextMove.Equals(nomove))
-            {
-                nonFoodGoal = _targetLocator.DetermineNonFoodGoal(game);
-                nextMove = _pathService.FindPath(game, nonFoodGoal, false);
-            }
+            //var nonFoodGoal = foodGoal;
+            //if(nextMove.Equals(nomove))
+            //{
+            //    nonFoodGoal = _targetLocator.DetermineNonFoodGoal(game);
 
-            //Immediately safe food goal
-            if (nextMove.Equals(nomove))
-            { 
-                nextMove = _pathService.FindPath(game, foodGoal, true);
-            }
+            //    nextMove = _pathService.FindPath(game, nonFoodGoal, false);
+            //}
 
-            //Immediately safe non-food goal
-            if (nextMove.Equals(nomove))
-            {
-                nextMove = _pathService.FindPath(game, nonFoodGoal, true);
-            }
+            ////Immediately safe food goal
+            //if (nextMove.Equals(nomove))
+            //{ 
+            //    nextMove = _pathService.FindPath(game, foodGoal, true);
+            //}
+
+            ////Immediately safe non-food goal
+            //if (nextMove.Equals(nomove))
+            //{
+            //    nextMove = _pathService.FindPath(game, nonFoodGoal, true);
+            //}
 
             //No safe food, flood fill to largest area
             if(nextMove.Equals(nomove) || !_floodFiller.CanFlood(nextMove, game)) // bug in canflood

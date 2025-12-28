@@ -106,12 +106,10 @@ namespace Felersnake.Services
 
             queue.Enqueue(start);
             visited.Add(start);
-            int count = 0;
 
             while (queue.Count > 0)
             {
                 var point = queue.Dequeue();
-                count++;
 
                 var neighbors = new List<Coordinate>
                 {
@@ -124,7 +122,7 @@ namespace Felersnake.Services
                 foreach (var n in neighbors)
                 {
                     if (!visited.Contains(n) &&
-                        _coordinateChecker.IsCoordinateSafe(game.Board, point, game.You, true))
+                        _coordinateChecker.IsCoordinateSafe(game.Board, n, game.You, true))
                     {
                         visited.Add(n);
                         queue.Enqueue(n);
@@ -132,7 +130,7 @@ namespace Felersnake.Services
                 }
             }
 
-            return count;
+            return visited.Count;
         }
 
         private int FloodFillImmediatelySafe(Coordinate start, GameStatusRequest game)
@@ -144,12 +142,10 @@ namespace Felersnake.Services
 
             queue.Enqueue(start);
             visited.Add(start);
-            int count = 0;
 
             while (queue.Count > 0)
             {
                 var point = queue.Dequeue();
-                count++;
 
                 var neighbors = new List<Coordinate>
                 {
@@ -162,7 +158,7 @@ namespace Felersnake.Services
                 foreach (var n in neighbors)
                 {
                     if (!visited.Contains(n) &&
-                        _coordinateChecker.IsCoordinateImmediatelySafe(game.Board, point, true))
+                        _coordinateChecker.IsCoordinateImmediatelySafe(game.Board, n, true))
                     {
                         visited.Add(n);
                         queue.Enqueue(n);
@@ -170,7 +166,7 @@ namespace Felersnake.Services
                 }
             }
 
-            return count;
+            return visited.Count;
         }
     }
 }
