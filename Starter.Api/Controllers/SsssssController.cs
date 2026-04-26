@@ -26,11 +26,11 @@ namespace Starter.Api.Controllers
             var info = new
             {
                 apiversion = "1",
-                author = "trickett", // TODO: Your Battlesnake Username
-                color = "#fc7b03", // TODO: Personalize
+                author = "trickett",
+                color = "#fc7b03",
                 //color = "#008080",
-                head = "gamer", // TODO: Personalize
-                tail = "pixel"  // TODO: Personalize
+                head = "gamer",
+                tail = "pixel"
             };
             return Ok(info);
         }
@@ -46,28 +46,7 @@ namespace Starter.Api.Controllers
         {
             //Fully safe food goal
             var foodGoal = _targetLocator.DetermineGoal(game);
-            var nextMove = _pathService.FindPath(game, foodGoal, false);
-
-            //Fully safe non-food goal
-            //var nonFoodGoal = foodGoal;
-            //if(nextMove.Equals(nomove))
-            //{
-            //    nonFoodGoal = _targetLocator.DetermineNonFoodGoal(game);
-
-            //    nextMove = _pathService.FindPath(game, nonFoodGoal, false);
-            //}
-
-            ////Immediately safe food goal
-            //if (nextMove.Equals(nomove))
-            //{ 
-            //    nextMove = _pathService.FindPath(game, foodGoal, true);
-            //}
-
-            ////Immediately safe non-food goal
-            //if (nextMove.Equals(nomove))
-            //{
-            //    nextMove = _pathService.FindPath(game, nonFoodGoal, true);
-            //}
+            var nextMove = foodGoal != null ? _pathService.FindPath(game, foodGoal, false) :  nomove;
 
             //No safe food, flood fill to largest area
             if(nextMove.Equals(nomove) || !_floodFiller.CanFlood(nextMove, game)) // bug in canflood
