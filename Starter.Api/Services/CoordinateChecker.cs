@@ -12,13 +12,6 @@ namespace Felersnake.Services
 
     public class CoordinateChecker : ICoordinateChecker
     {
-        private readonly GlobalSnakeValues _global;
-
-        public CoordinateChecker(GlobalSnakeValues global)
-        {
-            _global = global;
-        }
-
         public bool IsCoordinateSafe(Board board, Coordinate toCheck, Snake me, bool floodCheck = false)
         {
             if(!IsCoordinateImmediatelySafe(board, toCheck, floodCheck))
@@ -32,7 +25,7 @@ namespace Felersnake.Services
         {
             bool notSafe = false;
 
-            foreach(var d in _global.Directions)
+            foreach(var d in GlobalSnakeValues.Directions)
             {
                 var next = new Coordinate(toCheck.X + d.X, toCheck.Y + d.Y);
                 if (board.Snakes.Any(s => s.Id != me.Id && s.Head.Equals(next) && (s.Length >= me.Length || !floodCheck)))

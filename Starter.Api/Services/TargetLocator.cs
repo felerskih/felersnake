@@ -12,12 +12,10 @@ namespace Felersnake.Services
     public class TargetLocator : ITargetLocator
     {
         private readonly ICoordinateChecker _coordinateChecker;
-        private readonly GlobalSnakeValues _global;
 
-        public TargetLocator(ICoordinateChecker coordinateChecker, GlobalSnakeValues global)
+        public TargetLocator(ICoordinateChecker coordinateChecker)
         {
             _coordinateChecker = coordinateChecker;
-            _global = global;
         }
 
         public Coordinate? DetermineGoal(GameStatusRequest game)

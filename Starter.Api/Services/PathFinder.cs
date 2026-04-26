@@ -12,12 +12,10 @@ namespace Felersnake.Services
     public class PathFinder : IPathFinder
     {
         private readonly ICoordinateChecker _coordinateChecker;
-        private readonly GlobalSnakeValues _global;
         
-        public PathFinder(ICoordinateChecker coordinateChecker, GlobalSnakeValues global)
+        public PathFinder(ICoordinateChecker coordinateChecker)
         {
             _coordinateChecker = coordinateChecker;
-            _global = global;
         }
 
 
@@ -52,7 +50,7 @@ namespace Felersnake.Services
                 if (current.Equals(goal))
                     break;
 
-                foreach (var d in _global.Directions)
+                foreach (var d in GlobalSnakeValues.Directions)
                 {
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
 
@@ -77,7 +75,7 @@ namespace Felersnake.Services
                 var current = frontier.Dequeue();
                 if (current.Equals(goal))
                     break;
-                foreach (var d in _global.Directions)
+                foreach (var d in GlobalSnakeValues.Directions)
                 {
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
                     if (_coordinateChecker.IsCoordinateImmediatelySafe(board, next) && !cameFrom.ContainsKey(next))
