@@ -55,10 +55,10 @@ namespace Felersnake.Services
                 }
             }
 
-            if (bestSpace < game.You.Length)
-            {
-                bestMove = _tailSeeker.FindTail(game);
-            }
+            //if (bestSpace < game.You.Length)
+            //{
+            //    bestMove = _tailSeeker.FindTail(game);
+            //}
 
             if (bestMove == null)
             {
