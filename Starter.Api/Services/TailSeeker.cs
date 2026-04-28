@@ -7,7 +7,7 @@ namespace Felersnake.Services
     public interface ITailSeeker
     {
         string? FindTail(GameStatusRequest game);
-        bool CanFindTail(GameStatusRequest game, Coordinate goal);
+        bool CanReachTailFromFood(GameStatusRequest game, Coordinate goal);
     }
 
     public class TailSeeker : ITailSeeker
@@ -19,7 +19,6 @@ namespace Felersnake.Services
             _pathFinder = pathFinder;
         }
 
-        //It might be worth while to implement another rule to check for food that can path to head and tail
         public string? FindTail(GameStatusRequest game)
         {
             var tail = game.You.Body.Last();
@@ -65,16 +64,14 @@ namespace Felersnake.Services
                     var nextCoord = new Coordinate(head.X + temp.X, head.Y + temp.Y);
                     if (!(nextCoord.X == coordNextToTail.X && coordNextToTail.Y == head.Y 
                             && game.Board.Food.Where(food => food.X == coordNextToTail.X && food.Y == coordNextToTail.Y).ToList().Any()))
-                    {
                         return dirToMove;
-                    }
                     Console.WriteLine($"You're about to eat yourself possibly on ${game.Turn}");
                 }
             }
             return null;
         }
 
-        public bool CanFindTail(GameStatusRequest game, Coordinate goal)
+        public bool CanReachTailFromFood(GameStatusRequest game, Coordinate goal)
         {
             var tail = game.You.Body.Last();
             var head = game.You.Head;

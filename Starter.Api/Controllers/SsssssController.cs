@@ -29,8 +29,8 @@ namespace Starter.Api.Controllers
             {
                 apiversion = "1",
                 author = "trickett",
-                //color = "#fc7b03",
-                color = "#008080",
+                color = "#fc7b03",
+                //color = "#008080",
                 head = "gamer",
                 tail = "pixel"
             };
@@ -52,7 +52,7 @@ namespace Starter.Api.Controllers
 
             //No safe food, flood fill to largest area
             if (nextMove.Equals(nomove) //|| !_floodFiller.CanFlood(nextMove, game)// bug in canflood
-                || (foodGoal != null && !_tailSeeker.CanFindTail(game, foodGoal)))
+                || (foodGoal != null && !_tailSeeker.CanReachTailFromFood(game, foodGoal)))
             {
                 nextMove = _tailSeeker.FindTail(game);
                 if (nextMove == null)
