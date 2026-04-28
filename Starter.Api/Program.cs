@@ -7,6 +7,7 @@ builder.Services.AddTransient<IPathFinder, PathFinder>();
 builder.Services.AddTransient<ITargetLocator, TargetLocator>();
 builder.Services.AddTransient<ICoordinateChecker, CoordinateChecker>();
 builder.Services.AddTransient<IFloodFiller, FloodFiller>();
+builder.Services.AddTransient<ITailSeeker, TailSeeker>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

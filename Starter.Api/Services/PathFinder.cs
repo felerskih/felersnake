@@ -6,7 +6,7 @@ namespace Felersnake.Services
 {
     public interface IPathFinder
     {
-        string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate);
+        string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate, Coordinate? start = null);
     }
 
     public class PathFinder : IPathFinder
@@ -19,23 +19,24 @@ namespace Felersnake.Services
         }
 
 
-        public string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate)
+        public string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate, Coordinate? start = null)
         {
-            var myHead = game.You.Body.First(); // Head position
+            if (start == null)
+                start = game.You.Body.First(); // Head position
             var me = game.You;
             var board = game.Board;
 
 
-            var cameFrom = SearchFrontierForSafeGoal(myHead, board, goal, me);
+            var cameFrom = SearchFrontierForSafeGoal(start, board, goal, me);
             var path = GetPath(goal, cameFrom);
             if(path.Count == 0 && FallbackToImmediate)
             {
                 //Couldn't find safe path to goal, try for immediately safe path
-                cameFrom = SearchFrontierForImmediatelySafeGoal(myHead, board, goal);
+                cameFrom = SearchFrontierForImmediatelySafeGoal(start, board, goal);
                 path = GetPath(goal, cameFrom);
             }
 
-            return GetDirectionFromPath(path, myHead);
+            return GetDirectionFromPath(path, start);
         }
 
         private Dictionary<Coordinate, Coordinate?> SearchFrontierForSafeGoal(Coordinate myHead, Board board, Coordinate goal, Snake me)

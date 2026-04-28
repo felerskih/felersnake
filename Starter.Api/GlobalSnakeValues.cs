@@ -12,6 +12,9 @@ namespace Felersnake.Global
                 new Coordinate(1, 0)   // right
             };
 
-
+        public static readonly Coordinate Down = Directions[0];
+        public static readonly Coordinate Up = Directions[1];
+        public static readonly Coordinate Left = Directions[2];
+        public static readonly Coordinate Right = Directions[3];
     }
 }
