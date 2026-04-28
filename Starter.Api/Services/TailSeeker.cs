@@ -7,6 +7,7 @@ namespace Felersnake.Services
     public interface ITailSeeker
     {
         string? FindTail(GameStatusRequest game);
+        bool CanFindTail(GameStatusRequest game, string next);
     }
 
     public class TailSeeker : ITailSeeker
@@ -72,6 +73,31 @@ namespace Felersnake.Services
                 }
             }
             return null;
+        }
+
+        public bool CanFindTail(GameStatusRequest game, string next)
+        {
+            var tail = game.You.Body.Last();
+
+            Coordinate temp = new Coordinate(0, 0);
+            if (next == "down")
+                temp = GlobalSnakeValues.Down;
+            if (next == "up")
+                temp = GlobalSnakeValues.Up;
+            if (next == "left")
+                temp = GlobalSnakeValues.Left;
+            if (next == "right")
+                temp = GlobalSnakeValues.Right;
+
+            foreach (var dir in GlobalSnakeValues.Directions)
+            {
+                var coordNextToTail = new Coordinate(tail.X + dir.X, tail.Y + dir.Y);
+                var dirToMove = _pathFinder.FindPath(game, coordNextToTail, true);
+                if (dirToMove != null && !string.Equals(dirToMove, "none", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return true;
         }
     }
 }
