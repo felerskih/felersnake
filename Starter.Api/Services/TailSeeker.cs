@@ -7,7 +7,7 @@ namespace Felersnake.Services
     public interface ITailSeeker
     {
         string? FindTail(GameStatusRequest game);
-        bool CanFindTail(GameStatusRequest game, string next);
+        bool CanFindTail(GameStatusRequest game, Coordinate goal);
     }
 
     public class TailSeeker : ITailSeeker
@@ -64,40 +64,42 @@ namespace Felersnake.Services
                         temp = GlobalSnakeValues.Right;
 
                     var nextCoord = new Coordinate(head.X + temp.X, head.Y + temp.Y);
-                    if (coordNextToTail.X == head.X && coordNextToTail.Y == head.Y)
+                    if (!(coordNextToTail.X == head.X && coordNextToTail.Y == head.Y))
                     {
+                        //This has never happened, need more testing to verify
                         Console.WriteLine($"You're about to eat yourself possibly on ${game.Turn}");
-                        return null;
+                        return dirToMove;
                     }
-                    return dirToMove;
                 }
             }
             return null;
         }
 
-        public bool CanFindTail(GameStatusRequest game, string next)
+        public bool CanFindTail(GameStatusRequest game, Coordinate goal)
         {
             var tail = game.You.Body.Last();
+            var head = game.You.Head;
 
             Coordinate temp = new Coordinate(0, 0);
-            if (next == "down")
-                temp = GlobalSnakeValues.Down;
-            if (next == "up")
-                temp = GlobalSnakeValues.Up;
-            if (next == "left")
-                temp = GlobalSnakeValues.Left;
-            if (next == "right")
-                temp = GlobalSnakeValues.Right;
+            //if (next == "down")
+            //    temp = GlobalSnakeValues.Down;
+            //if (next == "up")
+            //    temp = GlobalSnakeValues.Up;
+            //if (next == "left")
+            //    temp = GlobalSnakeValues.Left;
+            //if (next == "right")
+            //    temp = GlobalSnakeValues.Right;
 
+            var nextCoord = new Coordinate(head.X + temp.X, head.Y + temp.Y);
             foreach (var dir in GlobalSnakeValues.Directions)
             {
                 var coordNextToTail = new Coordinate(tail.X + dir.X, tail.Y + dir.Y);
-                var dirToMove = _pathFinder.FindPath(game, coordNextToTail, true);
+                var dirToMove = _pathFinder.FindPath(game, coordNextToTail, false, goal);
                 if (dirToMove != null && !string.Equals(dirToMove, "none", StringComparison.OrdinalIgnoreCase))
                     return true;
             }
 
-            return true;
+            return false;
         }
     }
 }

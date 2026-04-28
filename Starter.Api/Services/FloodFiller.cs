@@ -83,7 +83,7 @@ namespace Felersnake.Services
             return bestMove ?? "up"; // fallback
         }
 
-       
+       //There might be a bug in this, currently unused
         public bool CanFlood(string direction, GameStatusRequest game)
         {
             var myHead = game.You.Head;

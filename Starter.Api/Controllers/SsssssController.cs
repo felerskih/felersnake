@@ -51,8 +51,8 @@ namespace Starter.Api.Controllers
             var nextMove = foodGoal != null ? _pathService.FindPath(game, foodGoal, false) :  nomove;
 
             //No safe food, flood fill to largest area
-            if (nextMove.Equals(nomove) || !_floodFiller.CanFlood(nextMove, game)// bug in canflood
-                || ! _tailSeeker.CanFindTail(game, nextMove)) 
+            if (nextMove.Equals(nomove) //|| !_floodFiller.CanFlood(nextMove, game)// bug in canflood
+                || !_tailSeeker.CanFindTail(game, foodGoal))
             {
                 nextMove = _floodFiller.GetBestDirection(game);
             }
