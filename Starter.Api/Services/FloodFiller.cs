@@ -58,7 +58,6 @@ namespace Felersnake.Services
             if (bestSpace < game.You.Length)
             {
                 bestMove = _tailSeeker.FindTail(game);
-                //Console.WriteLine($"HadToFindTail: move {bestMove} :: turn {game.Turn}");
             }
 
             if (bestMove == null)
@@ -80,8 +79,6 @@ namespace Felersnake.Services
                     }
                 }
             }
-
-            
 
             return bestMove ?? "up"; // fallback
         }
