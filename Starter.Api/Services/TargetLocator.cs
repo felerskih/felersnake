@@ -7,21 +7,18 @@ namespace Felersnake.Services
     public interface ITargetLocator
     {
         Coordinate DetermineGoal(GameStatusRequest game);
-        Coordinate DetermineNonFoodGoal(GameStatusRequest game);
     }
 
     public class TargetLocator : ITargetLocator
     {
         private readonly ICoordinateChecker _coordinateChecker;
-        private readonly GlobalSnakeValues _global;
 
-        public TargetLocator(ICoordinateChecker coordinateChecker, GlobalSnakeValues global)
+        public TargetLocator(ICoordinateChecker coordinateChecker)
         {
             _coordinateChecker = coordinateChecker;
-            _global = global;
         }
 
-        public Coordinate DetermineGoal(GameStatusRequest game)
+        public Coordinate? DetermineGoal(GameStatusRequest game)
         {
             var myHead = game.You.Body.First(); // Head position
             var me = game.You;
@@ -32,29 +29,7 @@ namespace Felersnake.Services
             if (foodDistances.Any())
                 return foodDistances.OrderBy(it => it.dist).First().Coordinate;
 
-            return DetermineNonFoodGoal(game);
-        }
-
-        public Coordinate DetermineNonFoodGoal(GameStatusRequest game)
-        {
-            var myHead = game.You.Body.First(); // Head position
-            var me = game.You;
-
-            foreach (var d in _global.Directions)
-            {
-                var next = new Coordinate(myHead.X + d.X, myHead.Y + d.Y);
-                if (_coordinateChecker.IsCoordinateSafe(game.Board, next, me))
-                    return next;
-            }
-
-            foreach (var d in _global.Directions)
-            {
-                var next = new Coordinate(myHead.X + d.X, myHead.Y + d.Y);
-                if (_coordinateChecker.IsCoordinateImmediatelySafe(game.Board, next) && !game.Board.Food.Contains(next))
-                    return next;
-            }
-            //TODO: avoid areas that will trap us in the future even if there is food
-            return myHead;
+            return null;
         }
 
         //Potential Strategy to use in the future;
