@@ -49,7 +49,7 @@ namespace Felersnake.Services
                         return "right";
                 }
 
-                var dirToMove = _pathFinder.FindPath(game, coordNextToTail, true);
+                var dirToMove = _pathFinder.FindPath(game, coordNextToTail, false);
                 if (dirToMove != null && !string.Equals(dirToMove, "none", StringComparison.OrdinalIgnoreCase))
                 {
                     Coordinate temp = new Coordinate(0,0);
