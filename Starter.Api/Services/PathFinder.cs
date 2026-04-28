@@ -6,38 +6,37 @@ namespace Felersnake.Services
 {
     public interface IPathFinder
     {
-        string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate);
+        string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate, Coordinate? start = null);
     }
 
     public class PathFinder : IPathFinder
     {
         private readonly ICoordinateChecker _coordinateChecker;
-        private readonly GlobalSnakeValues _global;
         
-        public PathFinder(ICoordinateChecker coordinateChecker, GlobalSnakeValues global)
+        public PathFinder(ICoordinateChecker coordinateChecker)
         {
             _coordinateChecker = coordinateChecker;
-            _global = global;
         }
 
 
-        public string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate)
+        public string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate, Coordinate? start = null)
         {
-            var myHead = game.You.Body.First(); // Head position
+            if (start == null)
+                start = game.You.Body.First(); // Head position
             var me = game.You;
             var board = game.Board;
 
 
-            var cameFrom = SearchFrontierForSafeGoal(myHead, board, goal, me);
+            var cameFrom = SearchFrontierForSafeGoal(start, board, goal, me);
             var path = GetPath(goal, cameFrom);
             if(path.Count == 0 && FallbackToImmediate)
             {
                 //Couldn't find safe path to goal, try for immediately safe path
-                cameFrom = SearchFrontierForImmediatelySafeGoal(myHead, board, goal);
+                cameFrom = SearchFrontierForImmediatelySafeGoal(start, board, goal);
                 path = GetPath(goal, cameFrom);
             }
 
-            return GetDirectionFromPath(path, myHead);
+            return GetDirectionFromPath(path, start);
         }
 
         private Dictionary<Coordinate, Coordinate?> SearchFrontierForSafeGoal(Coordinate myHead, Board board, Coordinate goal, Snake me)
@@ -52,7 +51,7 @@ namespace Felersnake.Services
                 if (current.Equals(goal))
                     break;
 
-                foreach (var d in _global.Directions)
+                foreach (var d in GlobalSnakeValues.Directions)
                 {
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
 
@@ -77,7 +76,7 @@ namespace Felersnake.Services
                 var current = frontier.Dequeue();
                 if (current.Equals(goal))
                     break;
-                foreach (var d in _global.Directions)
+                foreach (var d in GlobalSnakeValues.Directions)
                 {
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
                     if (_coordinateChecker.IsCoordinateImmediatelySafe(board, next) && !cameFrom.ContainsKey(next))

@@ -1,4 +1,3 @@
-using Felersnake.Global;
 using Felersnake.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,7 +6,7 @@ builder.Services.AddTransient<IPathFinder, PathFinder>();
 builder.Services.AddTransient<ITargetLocator, TargetLocator>();
 builder.Services.AddTransient<ICoordinateChecker, CoordinateChecker>();
 builder.Services.AddTransient<IFloodFiller, FloodFiller>();
-builder.Services.AddSingleton<GlobalSnakeValues>();
+builder.Services.AddTransient<ITailSeeker, TailSeeker>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
