@@ -52,9 +52,14 @@ namespace Starter.Api.Controllers
 
             //No safe food, flood fill to largest area
             if (nextMove.Equals(nomove) //|| !_floodFiller.CanFlood(nextMove, game)// bug in canflood
-                || !_tailSeeker.CanFindTail(game, foodGoal))
+                || (foodGoal != null && !_tailSeeker.CanFindTail(game, foodGoal)))
             {
-                nextMove = _floodFiller.GetBestDirection(game);
+                nextMove = _tailSeeker.FindTail(game);
+                if (nextMove == null)
+                {
+                    Console.WriteLine($"flood fill time 🤑 {game.Turn}");
+                    nextMove = _floodFiller.GetBestDirection(game);
+                }
             }
 
             var moveResp = new MoveResponse

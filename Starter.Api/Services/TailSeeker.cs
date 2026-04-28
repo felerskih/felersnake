@@ -47,7 +47,6 @@ namespace Felersnake.Services
                         return "left";
                     if (inverseDir.X == 1)
                         return "right";
-
                 }
 
                 var dirToMove = _pathFinder.FindPath(game, coordNextToTail, true);
@@ -64,12 +63,12 @@ namespace Felersnake.Services
                         temp = GlobalSnakeValues.Right;
 
                     var nextCoord = new Coordinate(head.X + temp.X, head.Y + temp.Y);
-                    if (!(coordNextToTail.X == head.X && coordNextToTail.Y == head.Y))
+                    if (!(nextCoord.X == coordNextToTail.X && coordNextToTail.Y == head.Y 
+                            && game.Board.Food.Where(food => food.X == coordNextToTail.X && food.Y == coordNextToTail.Y).ToList().Any()))
                     {
-                        //This has never happened, need more testing to verify
-                        Console.WriteLine($"You're about to eat yourself possibly on ${game.Turn}");
                         return dirToMove;
                     }
+                    Console.WriteLine($"You're about to eat yourself possibly on ${game.Turn}");
                 }
             }
             return null;
@@ -80,17 +79,6 @@ namespace Felersnake.Services
             var tail = game.You.Body.Last();
             var head = game.You.Head;
 
-            Coordinate temp = new Coordinate(0, 0);
-            //if (next == "down")
-            //    temp = GlobalSnakeValues.Down;
-            //if (next == "up")
-            //    temp = GlobalSnakeValues.Up;
-            //if (next == "left")
-            //    temp = GlobalSnakeValues.Left;
-            //if (next == "right")
-            //    temp = GlobalSnakeValues.Right;
-
-            var nextCoord = new Coordinate(head.X + temp.X, head.Y + temp.Y);
             foreach (var dir in GlobalSnakeValues.Directions)
             {
                 var coordNextToTail = new Coordinate(tail.X + dir.X, tail.Y + dir.Y);
