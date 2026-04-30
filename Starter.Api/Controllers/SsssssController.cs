@@ -29,8 +29,8 @@ namespace Starter.Api.Controllers
             {
                 apiversion = "1",
                 author = "trickett",
-                color = "#fc7b03",
-                //color = "#008080",
+                //color = "#fc7b03",
+                color = "#008080",
                 head = "gamer",
                 tail = "pixel"
             };
