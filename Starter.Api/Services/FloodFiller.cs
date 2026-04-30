@@ -14,12 +14,10 @@ namespace Felersnake.Services
     public class FloodFiller : IFloodFiller
     {
         private readonly ICoordinateChecker _coordinateChecker;
-        private readonly ITailSeeker _tailSeeker;
 
-        public FloodFiller(ICoordinateChecker coordinateChecker, ITailSeeker tailSeeker)
+        public FloodFiller(ICoordinateChecker coordinateChecker)
         {
             _coordinateChecker = coordinateChecker;
-            _tailSeeker = tailSeeker;
         }
 
         public string GetBestDirection(GameStatusRequest game)
@@ -54,11 +52,6 @@ namespace Felersnake.Services
                     bestMove = move;
                 }
             }
-
-            //if (bestSpace < game.You.Length)
-            //{
-            //    bestMove = _tailSeeker.FindTail(game);
-            //}
 
             if (bestMove == null)
             {

@@ -11,11 +11,11 @@ namespace Felersnake.Services
 
     public class TargetLocator : ITargetLocator
     {
-        private readonly ICoordinateChecker _coordinateChecker;
+        private readonly IPathFinder _pathFinder;
 
-        public TargetLocator(ICoordinateChecker coordinateChecker)
+        public TargetLocator(IPathFinder pathFinder)
         {
-            _coordinateChecker = coordinateChecker;
+            _pathFinder = pathFinder;
         }
 
         public Coordinate? DetermineGoal(GameStatusRequest game)
@@ -23,7 +23,8 @@ namespace Felersnake.Services
             var myHead = game.You.Body.First(); // Head position
             var me = game.You;
 
-            var foodDistances = game.Board.Food.Where(it => !_coordinateChecker.IsCoordinateMovableToByAnotherSnake(game.Board, it, me, false))
+            
+            var foodDistances = game.Board.Food.Where(it => !_pathFinder.IsCoordinateMovableToByAnotherSnakeIn2Turns(game, it, me))
                 .Select(it => new { Coordinate = it, dist = Math.Abs(it.X - myHead.X) + Math.Abs(it.Y - myHead.Y) });
 
             if (foodDistances.Any())
