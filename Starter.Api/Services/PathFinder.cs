@@ -52,7 +52,7 @@ namespace Felersnake.Services
             var board = game.Board;
             var cameFrom = SearchFrontierForSafeGoal(start, game, goal, me);
             var path = GetPath(goal, cameFrom);
-            return path.Count();
+            return path.Count() == 0 ? 3 : path.Count(); //bad!
         }
 
         private Dictionary<Coordinate, Coordinate?> SearchFrontierForSafeGoal(Coordinate myHead, GameStatusRequest game, Coordinate goal, Snake me)

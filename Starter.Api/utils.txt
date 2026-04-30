@@ -1,0 +1,4 @@
+Scripts to test your snake:
+cd source/felersnake/battlesnakecli
+battlesnake play -W 11 -H 11 --name "felersnake" --url http://localhost:5000 --browser --delay 100
+battlesnake play -W 11 -H 11 --name "felersnake" --url http://localhost:5000 --name "2" --url http://localhost:5000 --browser --delay 100
