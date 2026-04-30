@@ -7,6 +7,7 @@ namespace Felersnake.Services
     public interface IPathFinder
     {
         string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate, Coordinate? start = null);
+        bool IsCoordinateMovableToByAnotherSnakeIn2Turns(GameStatusRequest game, Coordinate toCheck, Snake me);
     }
 
     public class PathFinder : IPathFinder
@@ -27,7 +28,7 @@ namespace Felersnake.Services
             var board = game.Board;
 
 
-            var cameFrom = SearchFrontierForSafeGoal(start, board, goal, me);
+            var cameFrom = SearchFrontierForSafeGoal(start, game, goal, me);
             var path = GetPath(goal, cameFrom);
             if(path.Count == 0 && FallbackToImmediate)
             {
@@ -39,7 +40,22 @@ namespace Felersnake.Services
             return GetDirectionFromPath(path, start);
         }
 
-        private Dictionary<Coordinate, Coordinate?> SearchFrontierForSafeGoal(Coordinate myHead, Board board, Coordinate goal, Snake me)
+        public bool IsCoordinateMovableToByAnotherSnakeIn2Turns(GameStatusRequest game, Coordinate toCheck, Snake me)
+        {
+            var shit = game.Board.Snakes.Any(s => s.Id != me.Id && GetPathCount(game, toCheck, false, s.Head) <= 2);
+            return shit;
+        }
+
+        private int GetPathCount(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate, Coordinate start)
+        {
+            var me = game.You;
+            var board = game.Board;
+            var cameFrom = SearchFrontierForSafeGoal(start, game, goal, me);
+            var path = GetPath(goal, cameFrom);
+            return path.Count();
+        }
+
+        private Dictionary<Coordinate, Coordinate?> SearchFrontierForSafeGoal(Coordinate myHead, GameStatusRequest game, Coordinate goal, Snake me)
         {
             var frontier = new Queue<Coordinate>();
             var cameFrom = new Dictionary<Coordinate, Coordinate?>();
@@ -55,7 +71,8 @@ namespace Felersnake.Services
                 {
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
 
-                    if (_coordinateChecker.IsCoordinateSafe(board, next, me) && !cameFrom.ContainsKey(next))
+                    if (_coordinateChecker.IsCoordinateSafe(game.Board, next, me) //&& !IsCoordinateMovableToByAnotherSnakeIn2Turns(game, next, me)
+                            && !cameFrom.ContainsKey(next))
                     {
                         frontier.Enqueue(next);
                         cameFrom[next] = current;
