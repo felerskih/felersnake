@@ -7,7 +7,7 @@ namespace Felersnake.Services
     public interface IPathFinder
     {
         string FindPath(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate, Coordinate? start = null);
-        bool IsCoordinateMovableToByAnotherSnakeIn2Turns(GameStatusRequest game, Coordinate toCheck, Snake me);
+        bool IsCoordinateMovableToByAnotherSnakeIn3Turns(GameStatusRequest game, Coordinate toCheck, Snake me);
     }
 
     public class PathFinder : IPathFinder
@@ -33,26 +33,24 @@ namespace Felersnake.Services
             if(path.Count == 0 && FallbackToImmediate)
             {
                 //Couldn't find safe path to goal, try for immediately safe path
-                cameFrom = SearchFrontierForImmediatelySafeGoal(start, board, goal);
+                cameFrom = SearchFrontierForImmediatelySafeGoal(start, game, goal, me);
                 path = GetPath(goal, cameFrom);
             }
 
             return GetDirectionFromPath(path, start);
         }
 
-        public bool IsCoordinateMovableToByAnotherSnakeIn2Turns(GameStatusRequest game, Coordinate toCheck, Snake me)
+        public bool IsCoordinateMovableToByAnotherSnakeIn3Turns(GameStatusRequest game, Coordinate toCheck, Snake me)
         {
-            var shit = game.Board.Snakes.Any(s => s.Id != me.Id && GetPathCount(game, toCheck, false, s.Head) <= 2);
-            return shit;
+            return game.Board.Snakes.Any(s => s.Id != me.Id && GetPathCount(game, toCheck, false, s.Head, me) <= 3);
         }
 
-        private int GetPathCount(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate, Coordinate start)
+        private int GetPathCount(GameStatusRequest game, Coordinate goal, bool FallbackToImmediate, Coordinate start, Snake me)
         {
-            var me = game.You;
             var board = game.Board;
-            var cameFrom = SearchFrontierForSafeGoal(start, game, goal, me);
+            var cameFrom = SearchFrontierForImmediatelySafeGoal(start, game, goal, me);
             var path = GetPath(goal, cameFrom);
-            return path.Count() == 0 ? 3 : path.Count(); //bad!
+            return path.Count() == 0 ? 4 : path.Count(); //bad!
         }
 
         private Dictionary<Coordinate, Coordinate?> SearchFrontierForSafeGoal(Coordinate myHead, GameStatusRequest game, Coordinate goal, Snake me)
@@ -71,7 +69,7 @@ namespace Felersnake.Services
                 {
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
 
-                    if (_coordinateChecker.IsCoordinateSafe(game.Board, next, me) //&& !IsCoordinateMovableToByAnotherSnakeIn2Turns(game, next, me)
+                    if (_coordinateChecker.IsCoordinateSafe(game.Board, next, me) && !IsCoordinateMovableToByAnotherSnakeIn3Turns(game, next, me)
                             && !cameFrom.ContainsKey(next))
                     {
                         frontier.Enqueue(next);
@@ -82,7 +80,7 @@ namespace Felersnake.Services
             return cameFrom;
         }
 
-        private Dictionary<Coordinate, Coordinate?> SearchFrontierForImmediatelySafeGoal(Coordinate myHead, Board board, Coordinate goal)
+        private Dictionary<Coordinate, Coordinate?> SearchFrontierForImmediatelySafeGoal(Coordinate myHead, GameStatusRequest game, Coordinate goal, Snake me)
         {
             var frontier = new Queue<Coordinate>();
             var cameFrom = new Dictionary<Coordinate, Coordinate?>();
@@ -96,7 +94,7 @@ namespace Felersnake.Services
                 foreach (var d in GlobalSnakeValues.Directions)
                 {
                     var next = new Coordinate(current.X + d.X, current.Y + d.Y);
-                    if (_coordinateChecker.IsCoordinateImmediatelySafe(board, next) && !cameFrom.ContainsKey(next))
+                    if (_coordinateChecker.IsCoordinateImmediatelySafe(game.Board, next, me) && !cameFrom.ContainsKey(next))
                     {
                         frontier.Enqueue(next);
                         cameFrom[next] = current;

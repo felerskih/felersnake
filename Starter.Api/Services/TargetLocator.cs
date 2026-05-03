@@ -24,7 +24,7 @@ namespace Felersnake.Services
             var me = game.You;
 
             
-            var foodDistances = game.Board.Food.Where(it => !_pathFinder.IsCoordinateMovableToByAnotherSnakeIn2Turns(game, it, me))
+            var foodDistances = game.Board.Food.Where(it => !_pathFinder.IsCoordinateMovableToByAnotherSnakeIn3Turns(game, it, me))
                 .Select(it => new { Coordinate = it, dist = Math.Abs(it.X - myHead.X) + Math.Abs(it.Y - myHead.Y) });
 
             if (foodDistances.Any())

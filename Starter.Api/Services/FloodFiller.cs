@@ -60,7 +60,7 @@ namespace Felersnake.Services
                     string move = kv.Key;
                     Coordinate start = kv.Value;
 
-                    if (!_coordinateChecker.IsCoordinateImmediatelySafe(game.Board, start, true))
+                    if (!_coordinateChecker.IsCoordinateImmediatelySafe(game.Board, start, game.You, true))
                         continue;
 
                     int space = FloodFillImmediatelySafe(start, game);
@@ -158,7 +158,7 @@ namespace Felersnake.Services
                 foreach (var n in neighbors)
                 {
                     if (!visited.Contains(n) &&
-                        _coordinateChecker.IsCoordinateImmediatelySafe(game.Board, n, true))
+                        _coordinateChecker.IsCoordinateImmediatelySafe(game.Board, n, game.You, true))
                     {
                         visited.Add(n);
                         queue.Enqueue(n);
